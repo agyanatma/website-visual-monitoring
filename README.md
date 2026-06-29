@@ -1,87 +1,85 @@
-# Welcome to React Router!
+# Website Visual Monitoring
 
-A modern, production-ready template for building full-stack React applications using React Router.
+Mobile-first website monitor for public client URLs. A separate worker uses Playwright/Chromium to check each URL roughly once per hour, detects clear failures with deterministic signals first, uses OpenRouter visual AI only for ambiguous cases, and sends one Discord alert per failure episode.
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/remix-run/react-router-templates/tree/main/default)
+## Decisions captured
 
-## Features
+- Public URLs only; no authenticated flows.
+- Mobile viewport by default: `390x844`.
+- Screenshots are ephemeral and not stored.
+- MySQL stores monitored URLs and latest result only.
+- Dashboard and worker run as separate processes.
+- Light Playwright stealth is enabled; no proxies or CAPTCHA solving.
 
-- 🚀 Server-side rendering
-- ⚡️ Hot Module Replacement (HMR)
-- 📦 Asset bundling and optimization
-- 🔄 Data loading and mutations
-- 🔒 TypeScript by default
-- 🎉 TailwindCSS for styling
-- 📖 [React Router docs](https://reactrouter.com/)
+See `CONTEXT.md` and `docs/adr/` for the domain language and architecture decisions.
 
-## Getting Started
-
-### Installation
-
-Install the dependencies:
+## Setup
 
 ```bash
 npm install
+cp .env.example .env
 ```
 
-### Development
+Set at minimum:
 
-Start the development server with HMR:
+```bash
+DATABASE_URL=mysql://user:password@host:3306/database
+ADMIN_USERNAME=admin
+ADMIN_PASSWORD_HASH=<sha256 password hash>
+SESSION_SECRET=<32+ random chars>
+DISCORD_WEBHOOK_URL=<discord webhook>
+```
+
+Generate a password hash:
+
+```bash
+node -e "console.log(require('crypto').createHash('sha256').update(process.argv[1]).digest('hex'))" 'your-password'
+```
+
+Run migrations:
+
+```bash
+npm run db:migrate
+```
+
+Install Chromium for Playwright if needed:
+
+```bash
+npx playwright install chromium
+```
+
+## Development
+
+Run the dashboard:
 
 ```bash
 npm run dev
 ```
 
-Your application will be available at `http://localhost:5173`.
+Run the monitoring worker in another terminal:
 
-## Building for Production
+```bash
+npm run dev:worker
+```
 
-Create a production build:
+## Production commands
 
 ```bash
 npm run build
+npm run start
+npm run worker
 ```
 
-## Deployment
+Run dashboard and worker as separate processes/services.
 
-### Docker Deployment
+## CSV import
 
-To build and run using Docker:
+CSV format:
 
-```bash
-docker build -t my-app .
-
-# Run the container
-docker run -p 3000:3000 my-app
+```csv
+name,url,enabled
+Client A,https://example.com,true
+Client B,https://example.org,false
 ```
 
-The containerized application can be deployed to any platform that supports Docker, including:
-
-- AWS ECS
-- Google Cloud Run
-- Azure Container Apps
-- Digital Ocean App Platform
-- Fly.io
-- Railway
-
-### DIY Deployment
-
-If you're familiar with deploying Node applications, the built-in app server is production-ready.
-
-Make sure to deploy the output of `npm run build`
-
-```
-├── package.json
-├── package-lock.json (or pnpm-lock.yaml, or bun.lockb)
-├── build/
-│   ├── client/    # Static assets
-│   └── server/    # Server-side code
-```
-
-## Styling
-
-This template comes with [Tailwind CSS](https://tailwindcss.com/) already configured for a simple default starting experience. You can use whatever CSS framework you prefer.
-
----
-
-Built with ❤️ using React Router.
+Duplicate URLs are skipped after light normalization.

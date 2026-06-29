@@ -4,17 +4,29 @@
   "type": "module",
   "scripts": {
     "build": "react-router build",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "tsx app/db/migrate.ts",
     "dev": "react-router dev",
+    "dev:worker": "tsx watch app/worker/index.ts",
     "start": "react-router-serve ./build/server/index.js",
-    "typecheck": "react-router typegen && tsc"
+    "typecheck": "react-router typegen && tsc",
+    "worker": "tsx app/worker/index.ts"
   },
   "dependencies": {
     "@react-router/node": "8.0.0",
     "@react-router/serve": "8.0.0",
+    "dotenv": "^17.4.2",
+    "drizzle-orm": "^0.45.2",
     "isbot": "^5.1.36",
+    "mysql2": "^3.22.5",
+    "playwright": "^1.61.1",
+    "playwright-extra": "^4.3.6",
+    "puppeteer-extra-plugin-stealth": "^2.11.2",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
-    "react-router": "8.0.0"
+    "react-router": "8.0.0",
+    "tsx": "^4.22.4",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@react-router/dev": "8.0.0",
@@ -22,6 +34,7 @@
     "@types/node": "^22",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
+    "drizzle-kit": "^0.31.10",
     "tailwindcss": "^4.2.2",
     "typescript": "^5.9.3",
     "vite": "^8.0.3"
