@@ -1,4 +1,14 @@
+.git
+.gitignore
+.env
+.env.*
+!.env.example
+Dockerfile
+docker-compose*.yml
+node_modules
 .react-router
 build
-node_modules
+coverage
+npm-debug.log*
+.DS_Store
 README.md

@@ -72,6 +72,18 @@ npm run worker
 
 Run dashboard and worker as separate processes/services.
 
+## Docker deploy
+
+Create `.env` from `.env.example`, set secrets, and set `DATABASE_URL` to your already-running MySQL database. Then deploy the dashboard app and worker in one command; the app runs migrations before it starts:
+
+```bash
+docker compose up --build -d
+```
+
+The dashboard is exposed on `http://localhost:3000` by default. Override the host port with `APP_PORT=8080 docker compose up --build -d`.
+
+Dokploy: deploy this Compose file as the app stack, add the variables from `.env.example` in Dokploy, and point `DATABASE_URL` at your database service in the same Dokploy environment, for example `mysql://user:password@mysql:3306/website_visual_monitoring`. Use the actual DB service/container hostname Dokploy shows.
+
 ## CSV import
 
 CSV format:

@@ -1,0 +1,43 @@
+x-app: &app
+  image: website-visual-monitoring:latest
+  build: .
+  restart: unless-stopped
+  environment:
+    - NODE_ENV=production
+    - HOST=0.0.0.0
+    - PORT=3000
+    - DATABASE_URL=${DATABASE_URL:?DATABASE_URL is required}
+    - SESSION_SECRET=${SESSION_SECRET:?SESSION_SECRET is required}
+    - ADMIN_USERNAME
+    - ADMIN_PASSWORD_HASH
+    - ADMIN_PASSWORD
+    - DISCORD_WEBHOOK_URL
+    - DISCORD_ALERTS_PER_MINUTE
+    - OPENROUTER_API_KEY
+    - OPENROUTER_MODEL
+    - CHECK_CADENCE_MINUTES
+    - CHECK_STALE_CLAIM_SECONDS
+    - MAX_CONCURRENT_CHECKS
+    - NAVIGATION_TIMEOUT_MS
+    - TOTAL_CHECK_TIMEOUT_MS
+    - STABILIZATION_DELAY_MS
+    - CONFIRMATION_RETRY_DELAY_MS
+    - VIEWPORT_WIDTH
+    - VIEWPORT_HEIGHT
+    - DB_CONNECTION_LIMIT
+    - DB_KEEP_ALIVE_INITIAL_DELAY_MS
+    - DB_RETRY_ATTEMPTS
+    - DB_RETRY_BASE_DELAY_MS
+
+services:
+  app:
+    <<: *app
+    command: ["sh", "-c", "npm run db:migrate && npm run start"]
+    ports:
+      - "${APP_PORT:-3000}:3000"
+
+  worker:
+    <<: *app
+    command: ["sh", "-c", "sleep ${WORKER_START_DELAY_SECONDS:-15} && npm run worker"]
+    depends_on:
+      - app
