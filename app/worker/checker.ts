@@ -21,9 +21,9 @@ const BLOCKED_TEXT_RE = /\b(access denied|forbidden|captcha|checking your browse
 
 export async function checkUrl(browser: Browser, url: string, config: AppConfig, ai: OpenRouterVisualClassifier) {
   return withTimeout(runCheck(browser, url, config, ai), config.TOTAL_CHECK_TIMEOUT_MS, () => ({
-    status: "FAILING" as const,
-    failureCategory: "DOWN" as const,
-    summary: "The check exceeded the total timeout.",
+    status: "UNKNOWN" as const,
+    failureCategory: null,
+    summary: "The monitor exceeded the total timeout before it could verify the page.",
     signals: ["total_timeout"],
     httpStatus: null,
     finalUrl: url,
@@ -80,13 +80,17 @@ async function runCheck(browser: Browser, url: string, config: AppConfig, ai: Op
     });
 
     try {
-      response = await page.goto(url, { waitUntil: "load", timeout: config.NAVIGATION_TIMEOUT_MS });
+      // Wait for DOM readiness instead of the full load event. Many healthy pages keep
+      // slow analytics/fonts/images open long enough to miss `load`, which caused
+      // false DOWN alerts with HTTP unknown.
+      response = await page.goto(url, { waitUntil: "domcontentloaded", timeout: config.NAVIGATION_TIMEOUT_MS });
     } catch (error) {
+      const timedOut = error instanceof Error && /timeout/i.test(error.message);
       return {
-        status: "FAILING",
-        failureCategory: "DOWN",
-        summary: error instanceof Error && /timeout/i.test(error.message) ? "Navigation timed out." : "Page navigation failed.",
-        signals: [error instanceof Error && /timeout/i.test(error.message) ? "navigation_timeout" : "navigation_error"],
+        status: timedOut ? "UNKNOWN" : "FAILING",
+        failureCategory: timedOut ? null : "DOWN",
+        summary: timedOut ? "Navigation timed out before the monitor could verify the page." : "Page navigation failed.",
+        signals: [timedOut ? "navigation_timeout" : "navigation_error"],
         httpStatus: null,
         finalUrl: page.url() || url,
         durationMs: Date.now() - started,

@@ -175,6 +175,7 @@ export async function updateCheckOutcome(input: {
   alertSentAt?: Date | null;
 }) {
   const isOk = input.status === "OK";
+  const isFailing = input.status === "FAILING";
 
   await withDbRetry(
     async () => {
@@ -191,9 +192,9 @@ export async function updateCheckOutcome(input: {
           latestCheckedAt: input.checkedAt,
           latestAiClassification: input.aiClassification ?? null,
           latestAiConfidence: input.aiConfidence ?? null,
-          failureStartedAt: isOk ? null : input.previous.failureStartedAt ?? input.checkedAt,
-          alertSentAt: isOk ? null : input.alertSentAt ?? input.previous.alertSentAt,
-          recoveredAt: isOk && input.previous.latestStatus === "FAILING" ? input.checkedAt : input.previous.recoveredAt,
+          failureStartedAt: isOk ? null : isFailing ? input.previous.failureStartedAt ?? input.checkedAt : input.previous.failureStartedAt,
+          alertSentAt: isOk ? null : isFailing ? input.alertSentAt ?? input.previous.alertSentAt : input.previous.alertSentAt,
+          recoveredAt: isOk && input.previous.failureStartedAt ? input.checkedAt : input.previous.recoveredAt,
           nextCheckAt: input.nextCheckAt,
           checkClaimedAt: null,
           checkClaimedBy: null,

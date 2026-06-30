@@ -70,11 +70,10 @@ async function processUrl(
   const first = await checkUrl(browser, monitoredUrl.url, config, ai);
   let final = first;
 
-  if (first.status === "FAILING") {
+  if (first.status !== "OK") {
     await delay(config.CONFIRMATION_RETRY_DELAY_MS);
-    final = await checkUrl(browser, monitoredUrl.url, config, ai);
-    final.summary = `Attempt 1: ${first.failureCategory ?? "UNKNOWN"}. Retry: ${final.summary}`;
-    final.signals = [...new Set([...first.signals, ...final.signals, "confirmation_retry"])] as string[];
+    const retry = await checkUrl(browser, monitoredUrl.url, config, ai);
+    final = combineConfirmationAttempts(first, retry);
   }
 
   const checkedAt = new Date();
@@ -104,6 +103,31 @@ async function processUrl(
   });
 
   console.log(`${monitoredUrl.url} -> ${final.status}${final.failureCategory ? `/${final.failureCategory}` : ""}`);
+}
+
+function combineConfirmationAttempts(first: Awaited<ReturnType<typeof checkUrl>>, retry: Awaited<ReturnType<typeof checkUrl>>) {
+  const signals = [...new Set([...first.signals, ...retry.signals, "confirmation_retry"])] as string[];
+  const summary = `Attempt 1: ${formatAttempt(first)}. Retry: ${retry.summary}`;
+
+  if (retry.status === "OK") {
+    return { ...retry, summary, signals };
+  }
+
+  if (first.status === "FAILING" && retry.status === "FAILING") {
+    return { ...retry, summary, signals };
+  }
+
+  return {
+    ...retry,
+    status: "UNKNOWN" as const,
+    failureCategory: null,
+    summary: `Inconclusive after retry. ${summary}`,
+    signals,
+  };
+}
+
+function formatAttempt(outcome: Awaited<ReturnType<typeof checkUrl>>) {
+  return `${outcome.status}${outcome.failureCategory ? `/${outcome.failureCategory}` : ""} - ${outcome.summary}`;
 }
 
 main().catch((error) => {
