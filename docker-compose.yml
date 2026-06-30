@@ -1,6 +1,5 @@
 x-app: &app
   image: website-visual-monitoring:latest
-  build: .
   restart: unless-stopped
   environment:
     - NODE_ENV=production
@@ -32,6 +31,7 @@ x-app: &app
 services:
   app:
     <<: *app
+    build: .
     command: ["sh", "-c", "npm run db:migrate && npm run start"]
     ports:
       - "${APP_PORT:-3000}:3000"
