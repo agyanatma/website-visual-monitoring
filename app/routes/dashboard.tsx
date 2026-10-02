@@ -460,11 +460,11 @@ function UrlList(props: {
         </div>
         <div className="table-scroll">
           <div className="table">
-            <div className="tr th">
+            <div className="tr th url-grid">
               <span>Name / URL</span><span>Status</span><span>Category</span><span>HTTP</span><span>Duration</span><span>Last checked</span><span>Enabled</span><span />
             </div>
             {rows.map((u) => (
-              <div key={u.id} className={`tr row ${u.enabled ? "" : "off"}`} onClick={() => props.onOpen(u.id)}>
+              <div key={u.id} className={`tr row url-grid ${u.enabled ? "" : "off"}`} onClick={() => props.onOpen(u.id)}>
                 <div className="cell-name">
                   <span className="n">{u.name}</span>
                   <span className="u">{u.url}</span>

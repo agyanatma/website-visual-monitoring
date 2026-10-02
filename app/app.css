@@ -419,6 +419,7 @@ code,
   gap: 16px;
   max-width: 1320px;
   width: 100%;
+  margin-inline: auto;
 }
 
 .page-head {
@@ -820,13 +821,14 @@ button.list-row:hover {
 }
 
 .table {
-  min-width: 940px;
+  width: 100%;
+  min-width: 1040px;
 }
 
 .tr {
   display: grid;
-  grid-template-columns: minmax(220px, 1.6fr) 96px 120px 60px 76px 130px 64px 72px;
-  gap: 12px;
+  grid-template-columns: minmax(240px, 2.4fr) 88px minmax(96px, 1fr) 64px 84px 184px 72px 72px;
+  column-gap: 16px;
   align-items: center;
   padding: 8px 16px;
   border-bottom: 1px solid var(--line);
@@ -841,8 +843,23 @@ button.list-row:hover {
   letter-spacing: 0.05em;
 }
 
+.url-grid > :nth-child(3),
+.url-grid > :nth-child(6) {
+  white-space: nowrap;
+}
+
+.url-grid > :nth-child(4),
+.url-grid > :nth-child(5) {
+  text-align: right;
+}
+
+.url-grid > :nth-child(7) {
+  display: flex;
+  justify-content: center;
+}
+
 .tr.row {
-  padding: 10px 16px;
+  padding: 12px 16px;
   cursor: pointer;
 }
 
