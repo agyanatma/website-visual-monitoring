@@ -85,6 +85,8 @@ export async function action({ request }: Route.ActionArgs) {
 type Filter = "All" | "OK" | "FAILING" | "UNKNOWN" | "Disabled";
 type View = "overview" | "urls" | "detail";
 
+const PAGE_SIZE = 20;
+
 const FILTERS: Array<{ key: Filter; label: string }> = [
   { key: "All", label: "All" },
   { key: "OK", label: "OK" },
@@ -105,6 +107,7 @@ export default function Dashboard() {
   const selectedId = Number(params.get("id")) || null;
   const rawFilter = params.get("filter") as Filter | null;
   const filter: Filter = FILTERS.some((f) => f.key === rawFilter) ? (rawFilter as Filter) : "All";
+  const page = Math.max(1, Number(params.get("page")) || 1);
   const view: View = rawView === "detail" ? "detail" : rawView === "urls" ? "urls" : "overview";
 
   useEffect(() => {
@@ -125,6 +128,17 @@ export default function Dashboard() {
   const open = (id: number) => setParams({ view: "detail", id: String(id) });
   const showUrls = (next: Filter = "All") => setParams(next === "All" ? { view: "urls" } : { view: "urls", filter: next });
   const setFilter = (next: Filter) => showUrls(next);
+  const setPage = (next: number) =>
+    setParams((prev) => {
+      const nextParams = new URLSearchParams(prev);
+      if (next <= 1) nextParams.delete("page");
+      else nextParams.set("page", String(next));
+      return nextParams;
+    });
+  const changeQuery = (next: string) => {
+    setQuery(next);
+    setPage(1);
+  };
 
   const crumbs =
     activeView === "overview" ? ["Overview"] : activeView === "urls" ? ["Monitored URLs"] : ["Monitored URLs", selected?.name ?? ""];
@@ -159,9 +173,11 @@ export default function Dashboard() {
             canEdit={canEdit}
             filter={filter}
             query={query}
+            page={page}
             counts={{ total, ok, failing, unknown }}
             onFilter={setFilter}
-            onQuery={setQuery}
+            onQuery={changeQuery}
+            onPage={setPage}
             onOpen={open}
             onAdd={() => addRef.current?.showModal()}
             onImport={() => importRef.current?.showModal()}
@@ -414,9 +430,11 @@ function UrlList(props: {
   urls: UrlRow[];
   filter: Filter;
   query: string;
+  page: number;
   counts: Counts;
   onFilter: (filter: Filter) => void;
   onQuery: (query: string) => void;
+  onPage: (page: number) => void;
   onOpen: (id: number) => void;
   onAdd: () => void;
   onImport: () => void;
@@ -428,6 +446,10 @@ function UrlList(props: {
     if ((filter === "OK" || filter === "FAILING" || filter === "UNKNOWN") && u.latestStatus !== filter) return false;
     return !q || u.name.toLowerCase().includes(q) || u.url.toLowerCase().includes(q);
   });
+  const pageCount = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
+  const page = Math.min(props.page, pageCount);
+  const start = (page - 1) * PAGE_SIZE;
+  const pageRows = rows.slice(start, start + PAGE_SIZE);
   const filterCount: Record<Filter, number> = {
     All: counts.total,
     OK: counts.ok,
@@ -463,7 +485,7 @@ function UrlList(props: {
             <div className="tr th url-grid">
               <span>Name / URL</span><span>Status</span><span>Category</span><span>HTTP</span><span>Duration</span><span>Last checked</span><span>Enabled</span><span />
             </div>
-            {rows.map((u) => (
+            {pageRows.map((u) => (
               <div key={u.id} className={`tr row url-grid ${u.enabled ? "" : "off"}`} onClick={() => props.onOpen(u.id)}>
                 <div className="cell-name">
                   <span className="n">{u.name}</span>
@@ -496,6 +518,18 @@ function UrlList(props: {
             ) : null}
           </div>
         </div>
+        {rows.length > PAGE_SIZE ? (
+          <div className="pagination">
+            <span className="muted small">
+              {start + 1}–{Math.min(start + PAGE_SIZE, rows.length)} of {rows.length}
+            </span>
+            <div className="pager">
+              <button className="btn xs" disabled={page <= 1} onClick={() => props.onPage(page - 1)}>← Prev</button>
+              <span className="muted small">Page {page} of {pageCount}</span>
+              <button className="btn xs" disabled={page >= pageCount} onClick={() => props.onPage(page + 1)}>Next →</button>
+            </div>
+          </div>
+        ) : null}
       </section>
     </>
   );

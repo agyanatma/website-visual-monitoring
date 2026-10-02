@@ -4,7 +4,7 @@ x-app: &app
   environment:
     - NODE_ENV=production
     - HOST=0.0.0.0
-    - PORT=3008
+    - PORT=3000
     - DATABASE_URL=${DATABASE_URL:?DATABASE_URL is required}
     - SESSION_SECRET=${SESSION_SECRET:?SESSION_SECRET is required}
     - ADMIN_USERNAME
