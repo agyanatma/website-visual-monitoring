@@ -4,7 +4,7 @@ x-app: &app
   environment:
     - NODE_ENV=production
     - HOST=0.0.0.0
-    - PORT=3000
+    - PORT=3008
     - DATABASE_URL=${DATABASE_URL:?DATABASE_URL is required}
     - SESSION_SECRET=${SESSION_SECRET:?SESSION_SECRET is required}
     - ADMIN_USERNAME
@@ -34,7 +34,7 @@ services:
     build: .
     command: ["sh", "-c", "npm run db:migrate && npm run start"]
     ports:
-      - "${APP_PORT:-3008}:3000"
+      - "${PORT:-3000}:3000"
 
   worker:
     <<: *app
