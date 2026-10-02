@@ -19,7 +19,7 @@ export default function AppLayout() {
     <div className="app">
       <aside className="sidebar">
         <div className="side-brand">
-          <div className="brand-mark sm">WVM</div>
+          <img className="brand-mark sm" src="/logo.png" alt="" />
           <div>
             <strong>Visual Monitoring</strong>
             <span>Production</span>

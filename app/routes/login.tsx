@@ -33,7 +33,7 @@ export default function Login() {
     <main className="login-shell">
       <div className="login-wrap">
         <div className="brand">
-          <div className="brand-mark">WVM</div>
+          <img className="brand-mark" src="/logo.png" alt="" />
           <strong>Website Visual Monitoring</strong>
         </div>
         <Form method="post" className="login-card">

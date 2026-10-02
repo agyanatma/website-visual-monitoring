@@ -208,13 +208,7 @@ code,
   width: 32px;
   height: 32px;
   border-radius: 8px;
-  background: var(--signal);
-  color: #fff;
-  display: grid;
-  place-items: center;
-  font-weight: 700;
-  font-size: 11px;
-  letter-spacing: -0.02em;
+  object-fit: cover;
   flex: none;
 }
 
@@ -222,7 +216,6 @@ code,
   width: 26px;
   height: 26px;
   border-radius: 6px;
-  font-size: 9px;
 }
 
 /* ---------- app shell ---------- */
