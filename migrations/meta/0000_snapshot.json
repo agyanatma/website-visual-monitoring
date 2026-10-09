@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "3f565d52-1fbb-4caf-8f94-1c5721e0b73d",
+  "id": "5d7f776d-9bcf-4bc7-b872-43ac11bdaaea",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "app_settings": {
@@ -204,28 +204,6 @@
           "notNull": false,
           "autoincrement": false
         },
-        "latest_compromise_result": {
-          "name": "latest_compromise_result",
-          "type": "enum('NOT_CHECKED','CLEAN','SUSPICIOUS','HACKED')",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "'NOT_CHECKED'"
-        },
-        "latest_compromise_findings": {
-          "name": "latest_compromise_findings",
-          "type": "json",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "known_script_sources": {
-          "name": "known_script_sources",
-          "type": "json",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
         "failure_started_at": {
           "name": "failure_started_at",
           "type": "timestamp",
@@ -256,34 +234,6 @@
         },
         "block_started_at": {
           "name": "block_started_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "compromise_started_at": {
-          "name": "compromise_started_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "compromise_last_seen_at": {
-          "name": "compromise_last_seen_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "compromise_evidence": {
-          "name": "compromise_evidence",
-          "type": "json",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "compromise_alert_sent_at": {
-          "name": "compromise_alert_sent_at",
           "type": "timestamp",
           "primaryKey": false,
           "notNull": false,

@@ -1,11 +1,11 @@
-CREATE TABLE `app_settings` (
+CREATE TABLE IF NOT EXISTS `app_settings` (
 	`key` varchar(100) NOT NULL,
 	`value` text NOT NULL,
 	`updated_at` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,
 	CONSTRAINT `app_settings_key` PRIMARY KEY(`key`)
 );
 --> statement-breakpoint
-CREATE TABLE `monitored_urls` (
+CREATE TABLE IF NOT EXISTS `monitored_urls` (
 	`id` bigint unsigned AUTO_INCREMENT NOT NULL,
 	`name` varchar(191) NOT NULL,
 	`url` text NOT NULL,
@@ -28,25 +28,18 @@ CREATE TABLE `monitored_urls` (
 	`latest_block_type` enum('CAPTCHA','BOT_CHALLENGE','ACCESS_DENIED','RATE_LIMITED'),
 	`latest_block_provider` varchar(64),
 	`latest_block_evidence` json,
-	`latest_compromise_result` enum('NOT_CHECKED','CLEAN','SUSPICIOUS','HACKED') NOT NULL DEFAULT 'NOT_CHECKED',
-	`latest_compromise_findings` json,
-	`known_script_sources` json,
 	`failure_started_at` timestamp,
 	`failure_episode_category` enum('DOWN','BLANK','ERROR_PAGE','VISUAL_BROKEN'),
 	`alert_sent_at` timestamp,
 	`recovered_at` timestamp,
 	`block_started_at` timestamp,
-	`compromise_started_at` timestamp,
-	`compromise_last_seen_at` timestamp,
-	`compromise_evidence` json,
-	`compromise_alert_sent_at` timestamp,
 	`created_at` timestamp NOT NULL DEFAULT (now()),
 	`updated_at` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,
 	CONSTRAINT `monitored_urls_id` PRIMARY KEY(`id`),
 	CONSTRAINT `monitored_urls_normalized_hash_unique` UNIQUE(`normalized_url_hash`)
 );
 --> statement-breakpoint
-CREATE TABLE `users` (
+CREATE TABLE IF NOT EXISTS `users` (
 	`id` bigint unsigned AUTO_INCREMENT NOT NULL,
 	`username` varchar(191) NOT NULL,
 	`name` varchar(191) NOT NULL,
